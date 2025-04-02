@@ -8,6 +8,7 @@ public class MovingImageExample extends JPanel implements KeyListener {
     private int x = 100;
     private int y = 100;
     private Image image;
+    private boolean upPressed, downPressed, leftPressed, rightPressed;
 
     public MovingImageExample() {
         // Открываем диалог для выбора файла изображения
@@ -25,6 +26,40 @@ public class MovingImageExample extends JPanel implements KeyListener {
         // Устанавливаем фокус на панель
         setFocusable(true);
         addKeyListener(this);
+
+        // Запускаем таймер для обновления положения объекта
+        Timer timer = new Timer(100, e -> move());
+        timer.start();
+    }
+
+    private void move() {
+        if (upPressed) {
+            y -= 9; // Перемещение вверх
+        }
+        if (downPressed) {
+            y += 9; // Перемещение вниз
+        }
+        if (leftPressed) {
+            x -= 9; // Перемещение влево
+        }
+        if (rightPressed) {
+            x += 9; // Перемещение вправо
+        }
+
+        // Телепортация
+        if (x < 0) {
+            x = getWidth() - 50; // Телепортация на правую сторону
+        } else if (x > getWidth() - 50) {
+            x = 0; // Телепортация на левую сторону
+        }
+
+        if (y < 0) {
+            y = getHeight() - 50; // Телепортация вниз
+        } else if (y > getHeight() - 50) {
+            y = 0; // Телепортация вверх
+        }
+
+        repaint(); // Перерисовка панели
     }
 
     @Override
@@ -37,35 +72,38 @@ public class MovingImageExample extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        // Обработка нажатия клавиши
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_UP:
+                upPressed = true;
+                break;
+            case KeyEvent.VK_DOWN:
+                downPressed = true;
+                break;
+            case KeyEvent.VK_LEFT:
+                leftPressed = true;
+                break;
+            case KeyEvent.VK_RIGHT:
+                rightPressed = true;
+                break;
+        }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        // Обработка отпускания клавиши
         switch (e.getKeyCode()) {
             case KeyEvent.VK_UP:
-                if (y - 50 >= 0) {
-                    y -= 50; // Перемещение вверх
-                }
+                upPressed = false;
                 break;
             case KeyEvent.VK_DOWN:
-                if (y + 50 <= getHeight() - 50) {
-                    y += 50; // Перемещение вниз
-                }
+                downPressed = false;
                 break;
             case KeyEvent.VK_LEFT:
-                if (x - 50 >= 0) {
-                    x -= 50; // Перемещение влево
-                }
+                leftPressed = false;
                 break;
             case KeyEvent.VK_RIGHT:
-                if (x + 50 <= getWidth() - 50) {
-                    x += 50; // Перемещение вправо
-                }
+                rightPressed = false;
                 break;
         }
-        repaint(); // Перерисовка панели
     }
 
     @Override
@@ -74,7 +112,7 @@ public class MovingImageExample extends JPanel implements KeyListener {
     }
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Простое перемещение");
+        JFrame frame = new JFrame("Более хитрое перемещение");
         MovingImageExample panel = new MovingImageExample();
         frame.add(panel);
         frame.setSize(800, 600); // Размеры окна
